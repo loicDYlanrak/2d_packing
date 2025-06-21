@@ -1,6 +1,5 @@
 def nfdh(rectangles, container_width, container_height):
-    """Next-Fit Decreasing Height algorithm"""
-    sorted_rects = sorted(rectangles, key=lambda x: -x[1])  # Tri par hauteur décroissante
+    sorted_rects = sorted(rectangles, key=lambda x: -x[1]) 
     
     shelves = []
     current_shelf = []
@@ -36,8 +35,7 @@ def nfdh(rectangles, container_width, container_height):
     return shelves
 
 def ffdh(rectangles, container_width, container_height):
-    """First-Fit Decreasing Height algorithm"""
-    sorted_rects = sorted(rectangles, key=lambda x: -x[1])  # Tri par hauteur décroissante
+    sorted_rects = sorted(rectangles, key=lambda x: -x[1])  # Tri par hauteur décroissant
     
     shelves = []
     

@@ -48,14 +48,13 @@ def worst_fit(items, bin_capacity):
 def brute_force(items, bin_capacity):
     from itertools import permutations
     
-    min_bins = len(items)  # pire cas: un bac par objet
+    min_bins = len(items)  
     
-    # On teste toutes les permutations possibles avec First-Fit
     for perm in permutations(items):
         bins = first_fit(perm, bin_capacity)
         if len(bins) < min_bins:
             min_bins = len(bins)
-            if min_bins == 1:  # solution optimale trouvée
+            if min_bins == 1:  
                 break
     
     return min_bins

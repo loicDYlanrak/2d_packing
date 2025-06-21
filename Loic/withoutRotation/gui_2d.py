@@ -77,12 +77,15 @@ class Packing2DApp(tk.Tk):
         # Frame des rectangles ajoutés
         list_frame = ttk.LabelFrame(main_frame, text="Rectangles List", padding=10)
         list_frame.grid(row=3, column=0, sticky="nsew", padx=(0, 10))
-        
+
         self.rect_listbox = tk.Listbox(list_frame, height=8, font=("Courier", 10))
         self.rect_listbox.pack(fill=tk.BOTH, expand=True)
-        
-        ttk.Button(list_frame, text="Remove Selected", command=self.remove_rectangle).grid(row=1, column=0, pady=5, sticky="we")
-        ttk.Button(list_frame, text="Clear All", command=self.clear_rectangles).grid(row=1, column=1, pady=5, sticky="we")
+
+        button_frame = ttk.Frame(list_frame)
+        button_frame.pack(fill=tk.X, pady=5)
+
+        ttk.Button(button_frame, text="Remove Selected", command=self.remove_rectangle).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
+        ttk.Button(button_frame, text="Clear All", command=self.clear_rectangles).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
         
         # Frame des algorithmes
         algo_frame = ttk.LabelFrame(main_frame, text="Algorithms", padding=10)
