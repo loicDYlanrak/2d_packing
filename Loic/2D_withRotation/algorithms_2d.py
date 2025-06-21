@@ -1,59 +1,74 @@
 import math
 from shapes import Circle, Rectangle, IsoscelesTriangle
 
+def check_collision(shape, placed_shapes):
+    for other in placed_shapes:
+        if shape.intersects(other):
+            return True
+    return False
+
 def ffdh(shapes, container_width, container_height):
-    """
-    First-Fit Decreasing Height algorithm for packing shapes
-    Returns a list of shelves with placed shapes
-    """
-    # Sort shapes by decreasing height (of their bounding box)
     sorted_shapes = sorted(shapes, key=lambda s: max(s.get_bounding_box()), reverse=True)
     
-    shelves = []
-    current_shelf = []
+    shelves = []  # Format: (height, shapes_list, y)
     current_y = 0
-    
+    placed_shapes = []
+
     for shape in sorted_shapes:
         placed = False
-        w, h = shape.get_bounding_box()
         
-        # Try to place in existing shelf
-        for i, shelf in enumerate(shelves):
-            shelf_height = max(s[1] for s in shelf)
-            shelf_width_used = sum(s[0] for s in shelf)
-            
-            if shelf_height >= h and (container_width - shelf_width_used) >= w:
-                # Place in this shelf
-                x = shelf_width_used
-                shape.x = x
-                shape.y = current_y
-                shelf.append((w, h, shape))
-                placed = True
+        # Essayer toutes les rotations
+        for rotation in [0, math.pi/2, math.pi]:
+            if placed:
                 break
-        
-        # If not placed in existing shelf, create new shelf
-        if not placed:
-            if current_y + h > container_height:
-                continue  # Doesn't fit in container
-            
-            # Try all possible rotations
-            for rotation in [0, math.pi/2, math.pi]:
-                shape.rotation = rotation
-                w, h = shape.get_bounding_box()
                 
-                if w <= container_width and current_y + h <= container_height:
+            shape.rotation = rotation
+            w, h = shape.get_bounding_box()
+
+            # Chercher dans les étagères existantes
+            for shelf in shelves:
+                shelf_height, shelf_shapes, shelf_y = shelf  # Décomposer les 3 éléments
+                shelf_width_used = sum(s.get_bounding_box()[0] for s in shelf_shapes)
+                
+                if shelf_height >= h and shelf_width_used + w <= container_width:
+                    shape.x = shelf_width_used
+                    shape.y = shelf_y
+                    
+                    if not check_collision(shape, placed_shapes):
+                        shelf_shapes.append(shape)
+                        placed_shapes.append(shape)
+                        placed = True
+                        break
+            
+            if placed:
+                break
+                
+            # Créer une nouvelle étagère (si possible)
+            if not placed:
+                if current_y + h <= container_height and w <= container_width:
                     shape.x = 0
                     shape.y = current_y
-                    shelves.append([(w, h, shape)])
-                    current_y += h
-                    placed = True
-                    break
-        
-        # If still not placed, try to rotate
-        if not placed:
-            continue
-    
-    return shelves
+                    
+                    if not check_collision(shape, placed_shapes):
+                        new_shelf = (h, [shape], current_y)
+                        shelves.append(new_shelf)
+                        placed_shapes.append(shape)
+                        current_y += h
+                        placed = True
+                        break
+
+    # Affichage des résultats (amélioré)
+    print("\n=== RESULT FROM ALGORITHM ===")
+    for i, shelf in enumerate(shelves):
+        shelf_height, shelf_shapes, shelf_y = shelf
+        print(f"Shelf {i+1} (height={shelf_height}, y={shelf_y}):")
+        for shape in shelf_shapes:
+            bbox = shape.get_bounding_box()
+            print(f"  {type(shape).__name__} at ({shape.x},{shape.y}) "
+                  f"size={bbox[0]}x{bbox[1]} rotation={shape.rotation}")
+
+    return [shelf[1] for shelf in shelves]
+
 
 def nfdh(shapes, container_width, container_height):
     """Next-Fit Decreasing Height algorithm"""

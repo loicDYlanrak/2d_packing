@@ -236,6 +236,8 @@ class Packing2DApp(tk.Tk):
             self.result_text.insert(tk.END, f"Container size: {container_w}x{container_h}\n")
             self.result_text.insert(tk.END, f"Rectangles to pack: {len(self.rectangles)}\n\n")
             
+
+            
             if algorithm_name == "NFDH":
                 shelves = nfdh(self.rectangles, container_w, container_h)
             elif algorithm_name == "FFDH":
@@ -247,14 +249,18 @@ class Packing2DApp(tk.Tk):
             
             # Calcul des statistiques
             total_area = container_w * container_h
-            packed_rects = [rect for shelf in shelves for rect in shelf]
+            packed_rects = [shape for shelf in shelves for shape in shelf]
+
             used_area = 0
             for shelf in shelves:
-                for (w, h, shape) in shelf:
+                for shape in shelf:  # Correction ici
                     if isinstance(shape, Circle):
                         used_area += math.pi * shape.radius ** 2
-                    else:  # Rectangle or Triangle
-                        used_area += w * h
+                    elif isinstance(shape, IsoscelesTriangle):
+                        used_area += shape.base * shape.height
+                    elif isinstance(shape, Rectangle):
+                        used_area += shape.width * shape.height
+
             efficiency = (used_area / total_area) * 100
             
             self.result_text.insert(tk.END, f"\nResults:\n")
