@@ -38,21 +38,18 @@ class Packing2DApp(tk.Tk):
         
         self.style.configure("Primary.TButton", background=self.primary_color, foreground="white")
         self.style.configure("Secondary.TButton", background=self.secondary_color, foreground="white")
-    
     def create_widgets(self):
         # Frame principal
         main_frame = ttk.Frame(self, padding="20")
         main_frame.pack(fill=tk.BOTH, expand=True)
         
         # Titre
-        title_label = ttk.Label(main_frame, text="2D Rectangle Packing Problem", style="Header.TLabel")
+        title_label = ttk.Label(main_frame, text="2D Shape Packing Problem", style="Header.TLabel")
         title_label.grid(row=0, column=0, columnspan=3, pady=(0, 20))
         
         # Frame de configuration du conteneur
         container_frame = ttk.LabelFrame(main_frame, text="Container Configuration", padding=10)
         container_frame.grid(row=1, column=0, sticky="nsew", padx=(0, 10), pady=(0, 10))
-        
-        
         
         ttk.Label(container_frame, text="Width:").grid(row=0, column=0, sticky="w")
         self.container_width_entry = ttk.Entry(container_frame)
@@ -64,25 +61,32 @@ class Packing2DApp(tk.Tk):
         self.container_height_entry.grid(row=1, column=1, pady=5)
         self.container_height_entry.insert(0, "20")
         
-        # Frame d'ajout de rectangles
-        rect_frame = ttk.LabelFrame(main_frame, text="Add Rectangles", padding=10)
-        rect_frame.grid(row=2, column=0, sticky="nsew", padx=(0, 10))
+        # Frame d'ajout de formes
+        shape_frame = ttk.LabelFrame(main_frame, text="Add Shapes", padding=10)
+        shape_frame.grid(row=2, column=0, sticky="nsew", padx=(0, 10))
         
-        # Dans la frame rect_frame
-        ttk.Label(rect_frame, text="Type:").grid(row=2, column=0, sticky="w")
-        self.shape_type = ttk.Combobox(rect_frame, values=["Rectangle", "Circle", "Triangle"])
-        self.shape_type.grid(row=2, column=1, pady=5)
+        # Contrôles pour le type de forme
+        ttk.Label(shape_frame, text="Shape Type:").grid(row=0, column=0, sticky="w", pady=(0, 5))
+        self.shape_type = ttk.Combobox(shape_frame, values=["Rectangle", "Circle", "Triangle"], state="readonly")
+        self.shape_type.grid(row=0, column=1, sticky="ew", pady=(0, 5))
         self.shape_type.current(0)
-
-        ttk.Label(rect_frame, text="Dimension 1:").grid(row=0, column=0, sticky="w")
-        self.dim1_entry = ttk.Entry(rect_frame)
-        self.dim1_entry.grid(row=0, column=1, pady=5)
-
-        ttk.Label(rect_frame, text="Dimension 2:").grid(row=1, column=0, sticky="w")
-        self.dim2_entry = ttk.Entry(rect_frame)
-        self.dim2_entry.grid(row=1, column=1, pady=5)
+        self.shape_type.bind("<<ComboboxSelected>>", self.update_dimension_labels)
         
-        ttk.Button(rect_frame, text="Add Rectangle", command=self.add_shape, style="Primary.TButton").grid(row=2, column=0, columnspan=2, pady=5, sticky="we")
+        # Contrôles pour les dimensions
+        self.dim1_label = ttk.Label(shape_frame, text="Width:")
+        self.dim1_label.grid(row=1, column=0, sticky="w", pady=2)
+        
+        self.dim1_entry = ttk.Entry(shape_frame)
+        self.dim1_entry.grid(row=1, column=1, sticky="ew", pady=2)
+        
+        self.dim2_label = ttk.Label(shape_frame, text="Height:")
+        self.dim2_label.grid(row=2, column=0, sticky="w", pady=2)
+        
+        self.dim2_entry = ttk.Entry(shape_frame)
+        self.dim2_entry.grid(row=2, column=1, sticky="ew", pady=2)
+        
+        # Bouton d'ajout
+        ttk.Button(shape_frame, text="Add Shape", command=self.add_shape, style="Primary.TButton").grid(row=3, column=0, columnspan=2, pady=(10, 0), sticky="ew")
         
         # Frame des rectangles ajoutés
         list_frame = ttk.LabelFrame(main_frame, text="Rectangles List", padding=10)
@@ -263,3 +267,19 @@ class Packing2DApp(tk.Tk):
         
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
+            
+    def update_dimension_labels(self, event=None):
+        shape_type = self.shape_type.get()
+        
+        if shape_type == "Rectangle":
+            self.dim1_label.config(text="Width:")
+            self.dim2_label.config(text="Height:")
+            self.dim2_entry.config(state="normal")
+        elif shape_type == "Circle":
+            self.dim1_label.config(text="Radius:")
+            self.dim2_label.config(text="(not used)")
+            self.dim2_entry.config(state="disabled")
+        elif shape_type == "Triangle":
+            self.dim1_label.config(text="Base:")
+            self.dim2_label.config(text="Height:")
+            self.dim2_entry.config(state="normal")
