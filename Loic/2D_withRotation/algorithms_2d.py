@@ -57,7 +57,6 @@ def ffdh(shapes, container_width, container_height):
                         placed = True
                         break
 
-    # Affichage des résultats (amélioré)
     print("\n=== RESULT FROM ALGORITHM ===")
     for i, shelf in enumerate(shelves):
         shelf_height, shelf_shapes, shelf_y = shelf
